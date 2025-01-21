@@ -3,6 +3,10 @@ name = "Aimit"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "aimit"
+path = "src/main.rs"
+
 [dependencies]
 git2 = "0.20.0"
 openssl = { version = "0.10", features = ["vendored"] }
