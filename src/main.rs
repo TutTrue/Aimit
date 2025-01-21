@@ -2,6 +2,7 @@ use std::process::exit;
 
 mod git;
 mod models;
+mod config;
 
 #[tokio::main]
 async fn main() {
