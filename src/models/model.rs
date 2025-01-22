@@ -9,7 +9,7 @@ pub trait AiModel {
     ) -> Result<String, Box<dyn std::error::Error>>;
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum ModelType {
     GEMINI,
     DEEPSEEK,

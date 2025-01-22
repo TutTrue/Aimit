@@ -16,9 +16,11 @@ struct ApiKeysConfig {
     deepseek_api_key: Option<String>,
 }
 
+const CONFIG_FILE: &str = "config.toml";
+
 impl Settings {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
-        let settings = fs::read_to_string("config.toml")?;
+        let settings = fs::read_to_string(CONFIG_FILE)?;
         let settings: Settings = toml::from_str(&settings)?;
         Ok(settings)
     }
@@ -48,7 +50,7 @@ impl Settings {
 
     pub fn save(&self) -> Result<(), Box<dyn std::error::Error>> {
         let settings = toml::to_string(self)?;
-        fs::write("config.toml", settings)?;
+        fs::write(CONFIG_FILE, settings)?;
         Ok(())
     }
 
