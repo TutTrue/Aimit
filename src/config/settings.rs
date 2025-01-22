@@ -40,7 +40,6 @@ impl Settings {
     pub fn update_api_key(&mut self, service: ModelType, api_key: Option<String>) {
         match service {
             ModelType::GEMINI => self.api_keys.gemini_api_key = api_key,
-            ModelType::DEEPSEEK => self.api_keys.deepseek_api_key = api_key,
         }
     }
 
@@ -57,7 +56,6 @@ impl Settings {
     pub fn get_api_key(&self, service: ModelType) -> Option<&str> {
         match service {
             ModelType::GEMINI => self.api_keys.gemini_api_key.as_deref(),
-            ModelType::DEEPSEEK => self.api_keys.deepseek_api_key.as_deref(),
         }
     }
 }

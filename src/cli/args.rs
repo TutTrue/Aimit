@@ -67,7 +67,7 @@ impl Cli {
     }
 
     fn select_model() -> io::Result<ModelType> {
-        let models = vec!["Gemini", "DeepSeek"];
+        let models = vec!["Gemini"];
         let selection = Select::new()
             .with_prompt("Select the AI model to use")
             .items(&models)
@@ -76,7 +76,6 @@ impl Cli {
             .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
         let model = match selection {
             0 => ModelType::GEMINI,
-            1 => ModelType::DEEPSEEK,
             _ => {
                 return Err(io::Error::new(
                     io::ErrorKind::InvalidInput,
