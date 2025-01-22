@@ -16,7 +16,7 @@ struct ApiKeysConfig {
     deepseek_api_key: Option<String>,
 }
 
-const CONFIG_FILE: &str = "config.toml";
+const CONFIG_FILE: &str = "Config.toml";
 
 impl Settings {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
