@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
+use strum_macros::EnumString;
 
 #[async_trait]
 pub trait AiModel {
@@ -9,7 +10,7 @@ pub trait AiModel {
     ) -> Result<String, Box<dyn std::error::Error>>;
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, EnumString)]
 pub enum ModelType {
     GEMINI,
     DEEPSEEK,

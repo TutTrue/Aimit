@@ -1,22 +1,30 @@
 use std::process::exit;
 
+use config::settings;
+
+mod cli;
+mod config;
 mod git;
 mod models;
-mod config;
 
 #[tokio::main]
 async fn main() {
+    let model_type = cli::args::Cli::run();
+    let settings = settings::Settings::new().unwrap();
+
     let path = std::path::Path::new(".");
     let diff = git::diff::get_staged_diff(path).unwrap();
     if diff == "" {
         print!("There is no diff\n");
         exit(1)
     }
-    let gemini =
-        models::ModelFactory::create_model(models::ModelType::GEMINI, "api-key-123".to_string());
-    let res = gemini.generate_commit_message(&diff).await;
+    let model = models::ModelFactory::create_model(
+        model_type.clone(),
+        settings.get_api_key(model_type).unwrap().to_string(),
+    );
+    let res = model.generate_commit_message(&diff).await;
     match res {
-        Ok(res) => print!("ok: {}", res),
+        Ok(res) => print!("{}", res),
         Err(res) => print!("err: {:?}", res),
     }
 }
