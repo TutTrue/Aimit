@@ -1,3 +1,5 @@
+use crate::config::settings;
+
 use super::model::AiModel;
 
 use async_trait::async_trait;
@@ -41,17 +43,12 @@ impl AiModel for GeminiModel {
         diff: &str,
     ) -> Result<String, Box<dyn std::error::Error>> {
         let client = reqwest::Client::new();
+        let settings = settings::Settings::new().unwrap();
 
         let request = serde_json::json!({
             "contents": [{
                 "parts": [{
-                  "text": format!(r#"Analyze the following git diff and generate a concise and meaningful commit message summarizing the changes.
-The commit message should follow best practices, including a short title and an optional detailed description if necessary.
-git diff:
-{}
-Requirements:
-  Title: 50 characters or less, summarizing the change.
-  Optional Description: If the change requires context, provide a brief explanation in the body."#, diff)
+                  "text": format!("{}{}",settings.get_prompt(), diff)
                 }]
               }]
         });
