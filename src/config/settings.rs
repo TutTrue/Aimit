@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
+use home::home_dir;
 
 use crate::models::ModelType;
 
@@ -16,11 +17,13 @@ struct ApiKeysConfig {
     deepseek_api_key: Option<String>,
 }
 
-const CONFIG_FILE: &str = "Config.toml";
+const CONFIG_FILE: &str = ".config/aimit/Config.toml";
 
 impl Settings {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
-        let settings = fs::read_to_string(CONFIG_FILE)?;
+        let home = home_dir().ok_or("Could not find home directory")?;
+        let config_path = home.join(CONFIG_FILE);
+        let settings = fs::read_to_string(config_path)?;
         let settings: Settings = toml::from_str(&settings)?;
         Ok(settings)
     }
