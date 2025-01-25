@@ -1,4 +1,4 @@
-use crate::config::settings;
+use crate::{config::settings, error::error::AimitError};
 
 use super::model::AiModel;
 
@@ -41,7 +41,7 @@ impl AiModel for GeminiModel {
     async fn generate_commit_message(
         &self,
         diff: &str,
-    ) -> Result<String, Box<dyn std::error::Error>> {
+    ) -> Result<String, AimitError> {
         let client = reqwest::Client::new();
         let settings = settings::Settings::new().unwrap();
 

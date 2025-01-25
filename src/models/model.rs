@@ -2,12 +2,14 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use strum_macros::EnumString;
 
+use crate::error::error::AimitError;
+
 #[async_trait]
 pub trait AiModel {
     async fn generate_commit_message(
         &self,
         diff: &str,
-    ) -> Result<String, Box<dyn std::error::Error>>;
+    ) -> Result<String, AimitError>;
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, EnumString)]

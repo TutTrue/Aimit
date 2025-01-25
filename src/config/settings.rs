@@ -2,7 +2,7 @@ use home::home_dir;
 use serde::{Deserialize, Serialize};
 use std::fs;
 
-use crate::models::ModelType;
+use crate::{error::error::AimitError, models::ModelType};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Settings {
@@ -20,8 +20,8 @@ struct ApiKeysConfig {
 const CONFIG_FILE: &str = ".config/aimit/Config.toml";
 
 impl Settings {
-    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
-        let home = home_dir().ok_or("Could not find home directory")?;
+    pub fn new() -> Result<Self, AimitError> {
+        let home = home_dir().ok_or(AimitError::HomeDirectoryNotFoundError)?;
         let config_path = home.join(CONFIG_FILE);
 
         if config_path.exists() {
@@ -55,23 +55,23 @@ impl Settings {
         self.default_model = model;
     }
 
-    pub fn save(&self) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn save(&self) -> Result<(), AimitError> {
         let settings = toml::to_string(self)?;
-        let home = home_dir().ok_or("Could not find home directory")?;
+        let home = home_dir().ok_or(AimitError::HomeDirectoryNotFoundError)?;
         let config_path = home.join(CONFIG_FILE);
 
         fs::write(config_path, settings)?;
         Ok(())
     }
 
-    pub fn get_api_key(&self, service: ModelType) -> Option<&str> {
+    pub fn get_api_key(&self, service: ModelType) -> Result<&str, AimitError> {
         match service {
-            ModelType::GEMINI => self.api_keys.gemini_api_key.as_deref(),
+            ModelType::GEMINI => self.api_keys.gemini_api_key.as_deref().ok_or(AimitError::ApiKeyNotFoundError),
         }
     }
 
-    fn create_default() -> Result<Self, Box<dyn std::error::Error>> {
-        let home = home_dir().ok_or("Could not find home directory")?;
+    fn create_default() -> Result<Self, AimitError> {
+        let home = home_dir().ok_or(AimitError::HomeDirectoryNotFoundError)?;
         let config_path = home.join(CONFIG_FILE);
 
         if let Some(parent) = config_path.parent() {
@@ -90,8 +90,8 @@ git diff:
 
 "#.to_string(),
             api_keys: ApiKeysConfig {
-                gemini_api_key: Some("".to_string()),
-                deepseek_api_key: Some("".to_string()),
+                gemini_api_key: None,
+                deepseek_api_key: None,
             },
         };
         let settings_str = toml::to_string(&settings)?;
