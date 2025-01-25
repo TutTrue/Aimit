@@ -17,7 +17,10 @@ async fn main() {
 async fn run() -> Result<(), error::error::AimitError> {
     let model_type = cli::args::Cli::run();
     let settings = settings::Settings::new()?;
-
+    let need_update = settings.version_needs_update().await.unwrap();
+    if need_update {
+        println!("There is a new available version of Aimit. run `aimit update` to update.\n");
+    }
     let path = std::path::Path::new(".");
     let diff = git::diff::get_staged_diff(path)?;
     if diff == "" {

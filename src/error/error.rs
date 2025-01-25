@@ -9,6 +9,9 @@ pub enum AimitError {
     TomlDeserializationError(toml::de::Error),
     TomlSerError(toml::ser::Error),
     ReqwestError(reqwest::Error),
+    FileNotFoundError(String),
+    VersionParseError,
+    SemverError(semver::Error),
 }
 
 impl std::fmt::Display for AimitError {
@@ -27,6 +30,9 @@ impl std::fmt::Display for AimitError {
             }
             AimitError::TomlSerError(err) => write!(f, "Toml serialization error: {}", err),
             AimitError::ReqwestError(err) => write!(f, "Reqwest error: {}", err),
+            AimitError::FileNotFoundError(path) => write!(f, "File not found: {}", path),
+            AimitError::VersionParseError => write!(f, "Error parsing version"),
+            AimitError::SemverError(err) => write!(f, "Semver error: {}", err),
         }
     }
 }
@@ -52,5 +58,11 @@ impl From<toml::ser::Error> for AimitError {
 impl From<reqwest::Error> for AimitError {
     fn from(error: reqwest::Error) -> Self {
         AimitError::ReqwestError(error)
+    }
+}
+
+impl From<semver::Error> for AimitError {
+    fn from(err: semver::Error) -> AimitError {
+        AimitError::SemverError(err)
     }
 }

@@ -1,6 +1,9 @@
 use home::home_dir;
+use reqwest;
+use semver::Version;
 use serde::{Deserialize, Serialize};
 use std::fs;
+use toml::Value;
 
 use crate::{error::error::AimitError, models::ModelType};
 
@@ -9,6 +12,7 @@ pub struct Settings {
     default_model: ModelType,
     prompt: String,
     api_keys: ApiKeysConfig,
+    version: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -66,7 +70,11 @@ impl Settings {
 
     pub fn get_api_key(&self, service: ModelType) -> Result<&str, AimitError> {
         match service {
-            ModelType::GEMINI => self.api_keys.gemini_api_key.as_deref().ok_or(AimitError::ApiKeyNotFoundError),
+            ModelType::GEMINI => self
+                .api_keys
+                .gemini_api_key
+                .as_deref()
+                .ok_or(AimitError::ApiKeyNotFoundError),
         }
     }
 
@@ -93,10 +101,44 @@ git diff:
                 gemini_api_key: None,
                 deepseek_api_key: None,
             },
+            version: Some(env!("CARGO_PKG_VERSION").to_string()),
         };
         let settings_str = toml::to_string(&settings)?;
         fs::write(config_path, settings_str)?;
         Ok(settings)
     }
 
+    pub fn get_version(&self) -> Option<&str> {
+        self.version.as_deref()
+    }
+
+    pub async fn version_needs_update(&self) -> Result<bool, AimitError> {
+        let latest_version = Self::fetch_latest_version().await?;
+        let current_version = Version::parse(self.get_version().unwrap_or("0.0.0"))?;
+        Ok(current_version < latest_version)
+    }
+
+    async fn fetch_latest_version() -> Result<Version, AimitError> {
+        let url = "https://raw.githubusercontent.com/MozBlbn/tuttrue-aimit/main/Cargo.toml";
+
+        let response = reqwest::get(url).await?;
+
+        if !response.status().is_success() {
+            return Err(AimitError::FileNotFoundError(format!(
+                "Failed to fetch Cargo.toml file: {}",
+                response.status()
+            )));
+        }
+        let cargo_toml_str = response.text().await?;
+
+        let cargo_toml: Value = cargo_toml_str.parse()?;
+
+        let version_str = cargo_toml["package"]["version"]
+            .as_str()
+            .ok_or(AimitError::VersionParseError)?;
+
+        let version = Version::parse(version_str).map_err(|_| AimitError::VersionParseError)?;
+
+        Ok(version)
+    }
 }

@@ -16,6 +16,14 @@ impl Cli {
             .author("Mahmoud Hamdy (TutTrue) <mahmoud.hamdy5113@gmail.com>")
             .about("Generates commit messages using AI")
             .arg(
+                Arg::new("update")
+                    .long("update")
+                    .short('u')
+                    .help("Update the application to the latest version")
+                    .action(clap::ArgAction::SetTrue)
+                    .conflicts_with_all(["prompt", "default", "model", "key"]),
+            )
+            .arg(
                 Arg::new("prompt")
                     .short('p')
                     .long("prompt")
@@ -54,6 +62,8 @@ impl Cli {
         if matches.get_flag("prompt") {
             Self::update_prompt().unwrap();
             std::process::exit(0);
+        } else if matches.get_flag("update") {
+            tokio::runtime::Runtime::new().unwrap().block_on(Self::update_version());
         } else if matches.contains_id("default") {
             let default = matches.get_one::<String>("default");
             Self::update_default_model(default.cloned());
@@ -118,7 +128,9 @@ impl Cli {
             Some(default) => match default.to_uppercase().parse::<ModelType>().ok() {
                 Some(value) => value,
                 None => {
-                    print!("Model not found\nuse \"aimit -d\" to select from supported models\n");
+                    eprintln!(
+                        "Model not found\nuse \"aimit -d\" to select from supported models\n"
+                    );
                     std::process::exit(0);
                 }
             },
@@ -134,7 +146,7 @@ impl Cli {
 
         let key = matches.get_one::<String>("key").unwrap().to_string();
         let model_flag = matches.contains_id("model");
-        
+
         let cur_model = if model_flag {
             let selected_model = matches.get_one::<String>("model");
             match selected_model {
@@ -151,7 +163,6 @@ impl Cli {
             settings.get_default_model().clone()
         };
 
-
         settings.update_api_key(cur_model, Some(key));
         settings.save().unwrap();
         std::process::exit(0);
@@ -162,11 +173,42 @@ impl Cli {
             Some(default) => match default.to_uppercase().parse::<ModelType>().ok() {
                 Some(value) => value,
                 None => {
-                    print!("Model not found\nuse \"aimit -m\" to select from supported models\n");
+                    eprintln!(
+                        "Model not found\nuse \"aimit -m\" to select from supported models\n"
+                    );
                     std::process::exit(1)
                 }
             },
             None => Self::select_model().unwrap(),
         }
+    }
+
+    async fn update_version() {
+        let settings = settings::Settings::new().unwrap();
+        let needs_update = settings.version_needs_update().await.unwrap();
+        if !needs_update {
+            println!("You are already using the latest version of Aimit.");
+            std::process::exit(0);
+        }
+        println!("Updating the application...");
+
+        let status = SysCommand::new("sh")
+        .arg("-c")
+        .arg("wget -qO- https://raw.githubusercontent.com/MozBlbn/tuttrue-aimit/refs/heads/main/install_aimit.sh | bash")
+        .status();
+
+        match status {
+            Ok(exit_status) => {
+                if exit_status.success() {
+                    println!("Update completed successfully.");
+                } else {
+                    eprintln!("Update failed with exit code: {:?}", exit_status.code());
+                }
+            }
+            Err(e) => {
+                eprintln!("Failed to run update script: {} please visit https://github.com/TutTrue/Aimit for more information", e);
+            }
+        }
+        std::process::exit(0);
     }
 }
