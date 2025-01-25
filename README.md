@@ -19,7 +19,7 @@
 You can install `aimit` system-wide by running the following command:
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/MozBlbn/tuttrue-aimit/refs/heads/main/install_aimit.sh | bash
+wget -qO- https://raw.githubusercontent.com/TutTrue/Aimit/refs/heads/main/install_aimit.sh | sudo bash
 ```
 
 This script will download and install the `aimit` binary to your system, making it available globally.

@@ -12,7 +12,7 @@ pub struct Cli;
 impl Cli {
     pub fn run() -> ModelType {
         let matches: clap::ArgMatches = Command::new("aimit")
-            .version("1.0")
+            .version(env!("CARGO_PKG_VERSION"))
             .author("Mahmoud Hamdy (TutTrue) <mahmoud.hamdy5113@gmail.com>")
             .about("Generates commit messages using AI")
             .arg(
@@ -194,7 +194,7 @@ impl Cli {
 
         let status = SysCommand::new("sh")
         .arg("-c")
-        .arg("wget -qO- https://raw.githubusercontent.com/MozBlbn/tuttrue-aimit/refs/heads/main/install_aimit.sh | sudo bash")
+        .arg("wget -qO- https://raw.githubusercontent.com/TutTrue/Aimit/refs/heads/main/install_aimit.sh | sudo bash")
         .status();
 
         match status {

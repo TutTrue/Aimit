@@ -121,7 +121,7 @@ git diff:
     }
 
     async fn fetch_latest_version() -> Result<Version, AimitError> {
-        let url = "https://raw.githubusercontent.com/MozBlbn/tuttrue-aimit/main/Cargo.toml";
+        let url = "https://raw.githubusercontent.com/TutTrue/Aimit/main/Cargo.toml";
 
         let response = reqwest::get(url).await?;
 
