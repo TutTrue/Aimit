@@ -57,7 +57,10 @@ impl Settings {
 
     pub fn save(&self) -> Result<(), Box<dyn std::error::Error>> {
         let settings = toml::to_string(self)?;
-        fs::write(CONFIG_FILE, settings)?;
+        let home = home_dir().ok_or("Could not find home directory")?;
+        let config_path = home.join(CONFIG_FILE);
+
+        fs::write(config_path, settings)?;
         Ok(())
     }
 
@@ -87,12 +90,13 @@ git diff:
 
 "#.to_string(),
             api_keys: ApiKeysConfig {
-                gemini_api_key: None,
-                deepseek_api_key: None,
+                gemini_api_key: Some("".to_string()),
+                deepseek_api_key: Some("".to_string()),
             },
         };
         let settings_str = toml::to_string(&settings)?;
         fs::write(config_path, settings_str)?;
         Ok(settings)
     }
+
 }
