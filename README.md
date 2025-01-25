@@ -106,6 +106,15 @@ aimit -p
 
 This will open your default text editor, allowing you to edit the prompt.
 
+### Updating Aimit
+
+You can update Aimit using the `-u` or `--update` flag:
+
+```bash
+aimit -u
+```
+
+
 ## Configuration
 
 The tool uses a `Config.toml` file to store settings such as the default AI model, API keys, and the prompt. This file is automatically created the first time you run the tool and is located in the `~/.config/aimit/` directory.
