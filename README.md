@@ -9,8 +9,22 @@
 - **Multiple AI Models**: Supports multiple AI models (currently only Gemini is implemented).
 - **API Key Management**: Easily manage API keys for different AI models.
 - **Default Model Selection**: Set a default AI model to use for generating commit messages.
+- **Interactive Model Selection**: If you're unsure which models are supported, you can run commands without specifying a value to trigger an interactive selection menu.
+- **Easy Installation**: Install the tool system-wide with a single command.
 
 ## Installation
+
+### Quick Installation
+
+You can install `aimit` system-wide by running the following command:
+
+```bash
+wget -qO- https://raw.githubusercontent.com/MozBlbn/tuttrue-aimit/refs/heads/main/install_aimit.sh | bash
+```
+
+This script will download and install the `aimit` binary to your system, making it available globally.
+
+### Manual Installation
 
 1. **Clone the repository**:
    ```bash
@@ -48,6 +62,12 @@ You can specify a different AI model using the `-m` or `--model` flag:
 aimit -m gemini
 ```
 
+If you're unsure which models are supported, you can run the command without specifying a value to trigger an interactive selection menu:
+
+```bash
+aimit -m
+```
+
 ### Setting an API Key
 
 To set the API key for a specific AI model, use the `-k` or `--key` flag:
@@ -56,12 +76,24 @@ To set the API key for a specific AI model, use the `-k` or `--key` flag:
 aimit -k YOUR_API_KEY -m gemini
 ```
 
+If you're unsure which models are supported, you can run the command without specifying a value to trigger an interactive selection menu:
+
+```bash
+aimit -k YOUR_API_KEY -m
+```
+
 ### Updating the Default Model
 
 You can update the default AI model using the `-d` or `--default` flag:
 
 ```bash
 aimit -d gemini
+```
+
+If you're unsure which models are supported, you can run the command without specifying a value to trigger an interactive selection menu:
+
+```bash
+aimit -d
 ```
 
 ### Customizing the Prompt
@@ -76,7 +108,7 @@ This will open your default text editor, allowing you to edit the prompt.
 
 ## Configuration
 
-The tool uses a `Config.toml` file to store settings such as the default AI model, API keys, and the prompt. This file is automatically created the first time you run the tool.
+The tool uses a `Config.toml` file to store settings such as the default AI model, API keys, and the prompt. This file is automatically created the first time you run the tool and is located in the `~/.config/aimit/` directory.
 
 ### Example `Config.toml`
 
@@ -87,6 +119,16 @@ prompt = "Analyze the following git diff and generate a concise and meaningful c
 [api_keys]
 gemini_api_key = "YOUR_GEMINI_API_KEY"
 ```
+
+### Config File Location
+
+The configuration file (`Config.toml`) is stored in the following directory:
+
+```
+~/.config/aimit/Config.toml
+```
+
+You can manually edit this file to update settings such as the default model, API keys, or prompt.
 
 ## Supported AI Models
 
