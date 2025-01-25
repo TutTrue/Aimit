@@ -12,7 +12,7 @@ pub struct Settings {
     default_model: ModelType,
     prompt: String,
     api_keys: ApiKeysConfig,
-    version: Option<String>,
+    version_needs_update: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -101,20 +101,22 @@ git diff:
                 gemini_api_key: None,
                 deepseek_api_key: None,
             },
-            version: Some(env!("CARGO_PKG_VERSION").to_string()),
+            version_needs_update: false,
         };
         let settings_str = toml::to_string(&settings)?;
         fs::write(config_path, settings_str)?;
         Ok(settings)
     }
 
-    pub fn get_version(&self) -> Option<&str> {
-        self.version.as_deref()
+    pub fn get_version_needs_update(&self) -> bool {
+        self.version_needs_update
     }
 
-    pub async fn version_needs_update(&self) -> Result<bool, AimitError> {
+    pub async fn version_needs_update(&mut self) -> Result<bool, AimitError> {
         let latest_version = Self::fetch_latest_version().await?;
-        let current_version = Version::parse(self.get_version().unwrap_or("0.0.0"))?;
+        let current_version = Version::parse(env!("CARGO_PKG_VERSION"))?;
+        self.version_needs_update = current_version < latest_version;
+        self.save()?;
         Ok(current_version < latest_version)
     }
 

@@ -63,7 +63,7 @@ impl Cli {
             Self::update_prompt().unwrap();
             std::process::exit(0);
         } else if matches.get_flag("update") {
-            tokio::runtime::Runtime::new().unwrap().block_on(Self::update_version());
+            Self::update_version();
         } else if matches.contains_id("default") {
             let default = matches.get_one::<String>("default");
             Self::update_default_model(default.cloned());
@@ -183,9 +183,9 @@ impl Cli {
         }
     }
 
-    async fn update_version() {
+    fn update_version() {
         let settings = settings::Settings::new().unwrap();
-        let needs_update = settings.version_needs_update().await.unwrap();
+        let needs_update = settings.get_version_needs_update();
         if !needs_update {
             println!("You are already using the latest version of Aimit.");
             std::process::exit(0);
@@ -194,7 +194,7 @@ impl Cli {
 
         let status = SysCommand::new("sh")
         .arg("-c")
-        .arg("wget -qO- https://raw.githubusercontent.com/MozBlbn/tuttrue-aimit/refs/heads/main/install_aimit.sh | bash")
+        .arg("wget -qO- https://raw.githubusercontent.com/MozBlbn/tuttrue-aimit/refs/heads/main/install_aimit.sh | sudo bash")
         .status();
 
         match status {
