@@ -28,7 +28,7 @@ This script will download and install the `aimit` binary to your system, making 
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-repo/aimit.git
+   git clone https://github.com/TutTrue/Aimit.git
    cd aimit
    ```
 
