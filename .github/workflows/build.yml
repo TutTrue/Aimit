@@ -23,10 +23,10 @@ jobs:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
             asset_name: aimit-linux-x86_64
-          # Linux ARM64
-          - target: aarch64-unknown-linux-gnu
-            os: ubuntu-latest
-            asset_name: aimit-linux-aarch64
+          # # Linux ARM64
+          # - target: aarch64-unknown-linux-gnu
+          #   os: ubuntu-latest
+          #   asset_name: aimit-linux-aarch64
           # macOS x86_64 (Intel)
           - target: x86_64-apple-darwin
             os: macos-latest
