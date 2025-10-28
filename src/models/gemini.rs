@@ -55,7 +55,7 @@ impl AiModel for GeminiModel {
 
         let response: Response = client
             .post(&format!(
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={}",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={}",
                 self.api_key
             ))
             .header("Content-Type", "application/json")
