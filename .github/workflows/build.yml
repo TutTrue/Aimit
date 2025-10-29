@@ -144,6 +144,21 @@ jobs:
       - name: Prepare binaries for bin directory
         run: |
           mkdir -p bin
+          
+          # Remove old generic binary files if they exist (migration to platform-specific names)
+          if [[ -f "bin/aimit" ]]; then
+            echo "Removing old generic binary: bin/aimit"
+            rm "bin/aimit"
+          fi
+          if [[ -f "bin/aimit.exe" ]]; then
+            echo "Removing old generic binary: bin/aimit.exe"
+            rm "bin/aimit.exe"
+          fi
+          
+          # Debug: List all artifact directories
+          echo "Artifact directories:"
+          ls -la */
+          
           for artifact_dir in */; do
             artifact_name=$(basename "$artifact_dir")
             echo "Processing artifact: $artifact_name"
@@ -154,19 +169,39 @@ jobs:
               continue
             fi
 
+            echo "Contents of $artifact_dir:"
+            ls -la "$artifact_dir" || true
+            
             if [[ "$artifact_name" == *"windows"* ]]; then
               # Find the .exe file and copy it with platform-specific name
               exe_file=$(find "$artifact_dir" -name "*.exe" -type f | head -1)
               if [[ -n "$exe_file" ]]; then
                 cp "$exe_file" "bin/$artifact_name"
                 echo "Copied Windows binary: $exe_file -> bin/$artifact_name"
+              else
+                echo "WARNING: No .exe file found in $artifact_dir"
               fi
             else
-              # Find the binary file and copy it with platform-specific name
-              binary_file=$(find "$artifact_dir" -type f -executable | head -1)
+              # Find any binary file (try multiple methods)
+              # First try to find a file named 'aimit'
+              binary_file=$(find "$artifact_dir" -name "aimit" -type f | head -1)
+
+              # If not found, try finding any non-directory file
+              if [[ -z "$binary_file" ]]; then
+                binary_file=$(find "$artifact_dir" -type f ! -name ".*" | head -1)
+              fi
+
+              # If still not found, try with executable permission (may not work on Linux runner for macOS binaries)
+              if [[ -z "$binary_file" ]]; then
+                binary_file=$(find "$artifact_dir" -type f -executable | head -1)
+              fi
+
               if [[ -n "$binary_file" ]]; then
                 cp "$binary_file" "bin/$artifact_name"
+                chmod +x "bin/$artifact_name"
                 echo "Copied binary: $binary_file -> bin/$artifact_name"
+              else
+                echo "WARNING: No binary file found in $artifact_dir"
               fi
             fi
           done
