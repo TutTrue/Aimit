@@ -161,13 +161,15 @@ jobs:
           
           for artifact_dir in */; do
             artifact_name=$(basename "$artifact_dir")
-            echo "Processing artifact: $artifact_name"
-
-            # Skip the bin directory itself
-            if [[ "$artifact_name" == "bin" ]]; then
-              echo "Skipping bin directory"
+            
+            # Only process directories that start with 'aimit-' (actual artifacts)
+            # Skip workspace directories like bin/, src/, target/, etc.
+            if [[ ! "$artifact_name" =~ ^aimit- ]]; then
+              echo "Skipping non-artifact directory: $artifact_name"
               continue
             fi
+            
+            echo "Processing artifact: $artifact_name"
 
             echo "Contents of $artifact_dir:"
             ls -la "$artifact_dir" || true
@@ -183,17 +185,18 @@ jobs:
               fi
             else
               # Find any binary file (try multiple methods)
-              # First try to find a file named 'aimit'
-              binary_file=$(find "$artifact_dir" -name "aimit" -type f | head -1)
+              # First try to find a file named 'aimit' (limit depth to avoid source code)
+              binary_file=$(find "$artifact_dir" -maxdepth 2 -name "aimit" -type f | head -1)
 
-              # If not found, try finding any non-directory file
+              # If not found, try finding files in root of artifact directory only
+              # Exclude source code files and hidden files
               if [[ -z "$binary_file" ]]; then
-                binary_file=$(find "$artifact_dir" -type f ! -name ".*" | head -1)
+                binary_file=$(find "$artifact_dir" -maxdepth 1 -type f ! -name ".*" ! -name "*.rs" ! -name "*.toml" ! -name "*.json" ! -name "*.md" ! -name "*.txt" ! -name "*.yml" ! -name "*.yaml" ! -name "*.sh" | head -1)
               fi
 
-              # If still not found, try with executable permission (may not work on Linux runner for macOS binaries)
+              # If still not found, try with executable permission and depth limit
               if [[ -z "$binary_file" ]]; then
-                binary_file=$(find "$artifact_dir" -type f -executable | head -1)
+                binary_file=$(find "$artifact_dir" -maxdepth 2 -type f -executable ! -name "*.rs" ! -name "*.toml" ! -name "*.json" | head -1)
               fi
 
               if [[ -n "$binary_file" ]]; then
