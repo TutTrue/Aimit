@@ -57,9 +57,11 @@ download_binary() {
 
   # Check if wget or curl is available
   if command -v wget >/dev/null 2>&1; then
-    wget -q "$url" -O "$INSTALL_DIR/$binary_name"
+    wget -q "$url" -O "$INSTALL_DIR/$binary_name.new"
+    mv "$INSTALL_DIR/$binary_name.new" "$INSTALL_DIR/$binary_name"
   elif command -v curl >/dev/null 2>&1; then
-    curl -sL "$url" -o "$INSTALL_DIR/$binary_name"
+    curl -sL "$url" -o "$INSTALL_DIR/$binary_name.new"
+    mv "$INSTALL_DIR/$binary_name.new" "$INSTALL_DIR/$binary_name"
   else
     echo "Error: Neither wget nor curl is available. Please install one of them." >&2
     exit 1
