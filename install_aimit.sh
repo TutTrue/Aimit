@@ -50,10 +50,12 @@ get_binary_name() {
 download_binary() {
   local platform="$1"
   local binary_name="$2"
-  local url="$REPO_URL/bin/$binary_name"
+  # Use platform-specific binary name: aimit-{platform}
+  local platform_binary_name="aimit-${platform}"
+  local url="$REPO_URL/bin/$platform_binary_name"
 
   echo "Detected platform: $platform"
-  echo "Downloading binary: $binary_name..."
+  echo "Downloading binary: $platform_binary_name..."
 
   # Check if wget or curl is available
   if command -v wget >/dev/null 2>&1; then

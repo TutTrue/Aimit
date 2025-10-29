@@ -147,26 +147,26 @@ jobs:
           for artifact_dir in */; do
             artifact_name=$(basename "$artifact_dir")
             echo "Processing artifact: $artifact_name"
-            
+
             # Skip the bin directory itself
             if [[ "$artifact_name" == "bin" ]]; then
               echo "Skipping bin directory"
               continue
             fi
-            
+
             if [[ "$artifact_name" == *"windows"* ]]; then
-              # Find the .exe file and copy it
+              # Find the .exe file and copy it with platform-specific name
               exe_file=$(find "$artifact_dir" -name "*.exe" -type f | head -1)
               if [[ -n "$exe_file" ]]; then
-                cp "$exe_file" "bin/aimit.exe"
-                echo "Copied Windows binary: $exe_file -> bin/aimit.exe"
+                cp "$exe_file" "bin/$artifact_name"
+                echo "Copied Windows binary: $exe_file -> bin/$artifact_name"
               fi
             else
-              # Find the binary file and copy it
+              # Find the binary file and copy it with platform-specific name
               binary_file=$(find "$artifact_dir" -type f -executable | head -1)
               if [[ -n "$binary_file" ]]; then
-                cp "$binary_file" "bin/aimit"
-                echo "Copied binary: $binary_file -> bin/aimit"
+                cp "$binary_file" "bin/$artifact_name"
+                echo "Copied binary: $binary_file -> bin/$artifact_name"
               fi
             fi
           done
